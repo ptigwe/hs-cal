@@ -1,0 +1,7 @@
+flags: {}
+packages:
+- .
+extra-deps:
+- hoauth2-1.7.2
+- enumerator-0.4.20
+resolver: lts-11.14

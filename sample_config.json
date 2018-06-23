@@ -1,0 +1,11 @@
+{
+  "client_id":"",
+  "client_secret":"",
+  "redirect_uri":"http://localhost:5000/login/authorized",
+  "authority_url":"https://login.microsoftonline.com/common",
+  "auth_endpoint":"/oauth2/v2.0/authorize",
+  "token_endpoint":"/oauth2/v2.0/token",
+  "resource":"https://graph.microsoft.com",
+  "api_version":"v1.0",
+  "scope":"User.Read"
+}
