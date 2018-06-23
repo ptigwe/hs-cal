@@ -10,4 +10,5 @@ main :: IO ()
 main = do
   conf <- fmap fromJust readConfig
   let key = microKey conf
-  login key >>= print
+
+  login key >>= fetchToken key

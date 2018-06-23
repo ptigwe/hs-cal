@@ -3,6 +3,7 @@
 module Lib
   ( msReceiveAuthAndDie
   , login
+  , fetchToken
   ) where
 
 import Key
@@ -17,8 +18,12 @@ import Data.ByteString.Lazy.Char8 (unpack)
 import qualified Data.ByteString as B
 import Data.Maybe
 import qualified Data.ByteString.Builder as BB
+import qualified Data.ByteString.Char8 as C
+import qualified Data.Text as T
 import qualified URI.ByteString as URI
 import qualified Data.Map.Strict as M
+import Network.HTTP.Client (newManager)
+import Network.HTTP.Client.TLS
 
 msReceiveAuthAndDie :: IO (Maybe B.ByteString)
 msReceiveAuthAndDie = do
@@ -35,11 +40,17 @@ msReceiveAuthAndDie = do
   res <- takeMVar result
   return (fromMaybe Nothing . lookup "code" $ res)
 
-login :: OAuth2 -> IO (B.ByteString)
+login :: OAuth2 -> IO (T.Text)
 login key = do
   let uri = URI.serializeURIRef . buildAuthURL . authorizationUrl $ key
   openBrowser . unpack . BB.toLazyByteString $ uri
   res <- msReceiveAuthAndDie
   case res of
     Nothing -> login key
-    Just r -> return r
+    Just r -> return $ T.pack . C.unpack $ r
+
+fetchToken :: OAuth2 -> T.Text -> IO ()
+fetchToken key authKey = do
+  mgr <- newManager tlsManagerSettings
+  token <- fetchAccessToken mgr key (ExchangeToken authKey)
+  print token
