@@ -7,23 +7,23 @@ module Lib
   ) where
 
 import Key
+import Control.Concurrent.Async
+import Control.Concurrent.MVar
+import Data.ByteString.Lazy.Char8 (unpack)
+import qualified Data.ByteString as B
+import Data.ByteString.Builder (toLazyByteString)
+import qualified Data.ByteString.Char8 as C
+import Data.Maybe
+import qualified Data.Text as T
+import qualified URI.ByteString as URI
+import Network.HTTP.Client (newManager)
+import Network.HTTP.Client.TLS
+import qualified Network.OAuth.OAuth2 as OAuth
+import Network.OAuth.OAuth2.TokenRequest (Errors)
 import Network.Wai
 import Network.Wai.Handler.Warp
 import Network.HTTP.Types
-import Control.Concurrent.Async
-import Control.Concurrent.MVar
 import Web.Browser
-import Network.OAuth.OAuth2
-import Data.ByteString.Lazy.Char8 (unpack)
-import qualified Data.ByteString as B
-import Data.Maybe
-import qualified Data.ByteString.Builder as BB
-import qualified Data.ByteString.Char8 as C
-import qualified Data.Text as T
-import qualified URI.ByteString as URI
-import qualified Data.Map.Strict as M
-import Network.HTTP.Client (newManager)
-import Network.HTTP.Client.TLS
 
 msReceiveAuthAndDie :: IO (Maybe B.ByteString)
 msReceiveAuthAndDie = do
@@ -40,17 +40,16 @@ msReceiveAuthAndDie = do
   res <- takeMVar result
   return (fromMaybe Nothing . lookup "code" $ res)
 
-login :: OAuth2 -> IO (T.Text)
+login :: OAuth.OAuth2 -> IO (T.Text)
 login key = do
-  let uri = URI.serializeURIRef . buildAuthURL . authorizationUrl $ key
-  openBrowser . unpack . BB.toLazyByteString $ uri
+  let uri = URI.serializeURIRef . buildAuthURL . OAuth.authorizationUrl $ key
+  openBrowser . unpack . toLazyByteString $ uri
   res <- msReceiveAuthAndDie
   case res of
     Nothing -> login key
     Just r -> return $ T.pack . C.unpack $ r
 
-fetchToken :: OAuth2 -> T.Text -> IO ()
+fetchToken :: OAuth.OAuth2 -> T.Text -> IO (OAuth.OAuth2Result Errors OAuth.OAuth2Token)
 fetchToken key authKey = do
   mgr <- newManager tlsManagerSettings
-  token <- fetchAccessToken mgr key (ExchangeToken authKey)
-  print token
+  OAuth.fetchAccessToken mgr key (OAuth.ExchangeToken authKey)

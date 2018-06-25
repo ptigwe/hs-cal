@@ -4,15 +4,13 @@
 {-# LANGUAGE GADTs #-}
 module Key where
 
-import qualified Data.Text as T
-import qualified Data.ByteString as B
-import qualified Data.ByteString.Char8 as C
-import Data.Maybe
 import Data.Aeson
+import qualified Data.ByteString.Char8 as B
 import Data.Either.Combinators (rightToMaybe)
-import Network.OAuth.OAuth2
+import Data.Maybe
+import qualified Data.Text as T
+import qualified Network.OAuth.OAuth2 as OAuth
 import qualified URI.ByteString as URI
-import qualified URI.ByteString.QQ as QQ
 
 data Config = Config { clientID :: T.Text
                      , clientSecret :: T.Text
@@ -38,10 +36,10 @@ instance FromJSON Config where
            <*> o .: "scope"
 
 parseStrictURI :: T.Text -> Maybe (URI.URIRef URI.Absolute)
-parseStrictURI = rightToMaybe . URI.parseURI URI.strictURIParserOptions . C.pack . T.unpack
+parseStrictURI = rightToMaybe . URI.parseURI URI.strictURIParserOptions . B.pack . T.unpack
 
-microKey :: Config -> OAuth2
-microKey Config{..} = OAuth2 {..}
+microKey :: Config -> OAuth.OAuth2
+microKey Config{..} = OAuth.OAuth2 {..}
   where
     oauthClientId = clientID
     oauthClientSecret = clientSecret
