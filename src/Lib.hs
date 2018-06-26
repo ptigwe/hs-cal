@@ -8,7 +8,7 @@ module Lib
   , fetchUserInfo
   ) where
 
-import Key
+import Config
 import Control.Concurrent.Async
 import Control.Concurrent.MVar
 import Control.Lens

@@ -3,7 +3,12 @@
 {-# LANGUAGE QuasiQuotes #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE GADTs #-}
-module Key where
+module Config
+  ( Config
+  , microKey
+  , readConfig
+  , buildAuthURL
+  )where
 
 import Data.Aeson
 import GHC.Generics

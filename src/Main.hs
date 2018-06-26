@@ -3,7 +3,7 @@
 module Main where
 
 import Lib
-import Key
+import Config
 import Data.Maybe
 
 main :: IO ()
