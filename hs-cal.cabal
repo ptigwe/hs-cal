@@ -1,0 +1,62 @@
+-- This file has been generated from package.yaml by hpack version 0.28.2.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: 81b381b821564a91c9876374c5b95e7d0bcf6cc10264580eabf1b9ba8e20dd71
+
+name:           hs-cal
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/ptigwe/hs-cal#readme>
+homepage:       https://github.com/ptigwe/hs-cal#readme
+bug-reports:    https://github.com/ptigwe/hs-cal/issues
+author:         Tobenna P. Igwe
+maintainer:     ptigwe@gmail.com
+copyright:      2018 Tobenna P. Igwe
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+cabal-version:  >= 1.10
+extra-source-files:
+    ChangeLog.md
+    README.md
+
+source-repository head
+  type: git
+  location: https://github.com/ptigwe/hs-cal
+
+executable hs-cal
+  main-is: Main.hs
+  other-modules:
+      Paths_hs_cal
+  hs-source-dirs:
+      src
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      aeson
+    , async
+    , bytestring
+    , base >=4.7 && <5
+    , either
+    , http-client
+    , http-client-tls
+    , http-conduit
+    , hoauth2
+    , http-types
+    , open-browser
+    , text
+    , uri-bytestring
+    , wai
+    , warp
+  default-language: Haskell2010
+
+test-suite hs-cal-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_hs_cal
+  hs-source-dirs:
+      test
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+  default-language: Haskell2010
