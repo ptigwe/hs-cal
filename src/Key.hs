@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE QuasiQuotes #-}
 {-# LANGUAGE RecordWildCards #-}
@@ -5,6 +6,7 @@
 module Key where
 
 import Data.Aeson
+import GHC.Generics
 import qualified Data.ByteString.Char8 as B
 import Data.Either.Combinators (rightToMaybe)
 import Data.Maybe
@@ -19,21 +21,11 @@ data Config = Config { clientID :: T.Text
                      , authEndpoint :: T.Text
                      , tokenEndpoint :: T.Text
                      , resource :: T.Text
-                     , apiVersion :: T.Text
-                     , scope :: T.Text }
-  deriving (Show)
+                     , apiVersion :: T.Text}
+  deriving (Generic, Show)
 
 instance FromJSON Config where
-  parseJSON = withObject "config" $ \o ->
-    Config <$> o .: "client_id"
-           <*> o .: "client_secret"
-           <*> o .: "redirect_uri"
-           <*> o .: "authority_url"
-           <*> o .: "auth_endpoint"
-           <*> o .: "token_endpoint"
-           <*> o .: "resource"
-           <*> o .: "api_version"
-           <*> o .: "scope"
+  parseJSON = genericParseJSON defaultOptions {fieldLabelModifier = camelTo2 '_'}
 
 parseStrictURI :: T.Text -> Maybe (URI.URIRef URI.Absolute)
 parseStrictURI = rightToMaybe . URI.parseURI URI.strictURIParserOptions . B.pack . T.unpack
@@ -48,9 +40,9 @@ microKey Config{..} = OAuth.OAuth2 {..}
     oauthAccessTokenEndpoint = fromJust . parseStrictURI $ authorityURL `mappend` tokenEndpoint
 
 buildAuthURL :: URI.URI -> URI.URI
-buildAuthURL x@URI.URI{..} = x{URI.uriQuery=newPairs}
+buildAuthURL  = OAuth.appendQueryParams [("scope", scope), ("state", "abcde")]
   where
-    newPairs = uriQuery `mappend` (URI.Query [("scope", "User.Read"), ("state", "abcde")])
+    scope = "User.Read Calendar.Read"
 
 configFile :: FilePath
 configFile = "config.json"
