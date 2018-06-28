@@ -60,10 +60,9 @@ fetchToken key authKey = do
   mgr <- newManager tlsManagerSettings
   OAuth.fetchAccessToken mgr key (OAuth.ExchangeToken authKey)
 
-fetchUserInfo :: OAuth.OAuth2Token -> IO ()
-fetchUserInfo OAuth.OAuth2Token{..} = do
-  let token = T.encodeUtf8 . OAuth.atoken $ accessToken
-      opts = defaults & header "Accept" .~ ["application/json"]
+fetchUserInfo :: B.ByteString -> IO ()
+fetchUserInfo token = do
+  let opts = defaults & header "Accept" .~ ["application/json"]
                       & auth ?~ oauth2Bearer token
   getWith opts "https://graph.microsoft.com/v1.0/me/events" >>= print
 

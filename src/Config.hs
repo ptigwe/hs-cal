@@ -8,6 +8,7 @@ module Config
   , microKey
   , readConfig
   , addScope
+  , tmpToken
   )where
 
 import Data.Aeson
@@ -57,3 +58,6 @@ readConfig :: IO (Maybe Config)
 readConfig = do
   cont <- B.readFile configFile
   return (decodeStrict cont)
+
+tmpToken :: IO (B.ByteString)
+tmpToken = B.readFile "token"
