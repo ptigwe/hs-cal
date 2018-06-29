@@ -29,6 +29,7 @@ import Network.Wai
 import Network.Wai.Handler.Warp
 import Network.Wreq
 import Web.Browser
+import Text.Pretty.Simple (pPrint, pShowNoColor, pPrintNoColor)
 
 msReceiveAuthAndDie :: IO (Maybe B.ByteString)
 msReceiveAuthAndDie = do
@@ -64,5 +65,6 @@ fetchUserInfo :: B.ByteString -> IO ()
 fetchUserInfo token = do
   let opts = defaults & header "Accept" .~ ["application/json"]
                       & auth ?~ oauth2Bearer token
-  getWith opts "https://graph.microsoft.com/v1.0/me/events" >>= print
+  r <- getWith opts "https://graph.microsoft.com/v1.0/me/events"
+  pPrintNoColor $ r ^. responseBody
 
